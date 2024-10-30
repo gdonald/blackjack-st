@@ -1,6 +1,7 @@
 FileStream fileIn: 'card.st'.
 FileStream fileIn: 'hand.st'.
 FileStream fileIn: 'dealer_hand.st'.
+FileStream fileIn: 'player_hand.st'.
 
 | card card2 |
 card := Card value: 13 suit: 1.
@@ -10,19 +11,19 @@ Transcript show: card toString; cr.
 Transcript show: card2 toString; cr.
 
 
-| dealerHand |
-dealerHand := DealerHand new.
+| playerHand |
+playerHand := PlayerHand new.
 
-Transcript show: dealerHand toString; cr.
+Transcript show: playerHand toString; cr.
 
-dealerHand cards add: card.
+playerHand cards add: card.
 
-Transcript show: dealerHand toString; cr.
+Transcript show: playerHand toString; cr.
 
-dealerHand cards add: card2.
+playerHand cards add: card2.
 
-Transcript show: dealerHand toString; cr.
+Transcript show: playerHand toString; cr.
 
-dealerHand played: true.
+playerHand played: true.
 
-Transcript show: dealerHand toString; cr.
+Transcript show: playerHand toString; cr.
