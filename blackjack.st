@@ -1,28 +1,9 @@
-FileStream fileIn: 'card.st'.
-FileStream fileIn: 'hand.st'.
-FileStream fileIn: 'dealer_hand.st'.
+FileStream fileIn: 'game.st'.
 
-| card card2 |
-card := Card value: 13 suit: 1.
-card2 := Card value: 2 suit: 2.
+|game|
+game := Game new.
 
-Transcript show: card toString; cr.
-Transcript show: card2 toString; cr.
+"[ game quitting ] whileFalse: ["
+    game dealNewHand.
+"]"
 
-
-| dealerHand |
-dealerHand := DealerHand new.
-
-Transcript show: dealerHand toString; cr.
-
-dealerHand cards add: card.
-
-Transcript show: dealerHand toString; cr.
-
-dealerHand cards add: card2.
-
-Transcript show: dealerHand toString; cr.
-
-dealerHand played: true.
-
-Transcript show: dealerHand toString; cr.

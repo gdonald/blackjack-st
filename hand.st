@@ -8,17 +8,21 @@ Object subclass: Hand [
     Hand >> initialize [
         played := false.
         cards := OrderedCollection new.
-        
+
         ^ self
     ]
 
     Hand >> toString [
-        | cardsString |
+        | cardsString index cardCount |
         cardsString := ''.
+        index := 1.
+        cardCount := cards size.
 
-        cards do: [:card | 
-            cardsString := cardsString, card toString, ' '.
-        ].
+        cards do: [:card |
+                   cardsString := cardsString, card toString.
+                   (index < cardCount) ifTrue: [cardsString := cardsString, ' '].
+                   index := index + 1.
+                  ].
 
         ^ 'played: ', played printString, ' cards: [', cardsString, ']'
     ]
