@@ -1,11 +1,16 @@
 Object subclass: Card [
-    | value suit |
+    | game value suit |
 
-    Card class >> value: aValue suit: aSuit [
-        ^ self new initializeValue: aValue suit: aSuit
+    " Card class >> game: aGame value: aValue suit: aSuit [
+        ^ self new initialize: aGame value: aValue suit: aSuit
+    ] "
+
+    Card class >> initializeWithGame: aGame value: aValue suit: aSuit [
+        ^ self new initialize: aGame value: aValue suit: aSuit
     ]
     
-    Card >> initializeValue: aValue suit: aSuit [
+    Card >> initialize: aGame value: aValue suit: aSuit [
+        game := aGame.
         value := aValue.
         suit := aSuit.
         ^ self

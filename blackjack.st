@@ -7,3 +7,6 @@ game := Game new.
     game dealNewHand.
 "]"
 
+(game shoe cards) do: [ :card |
+    Transcript show: card toString; cr.
+].

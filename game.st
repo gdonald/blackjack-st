@@ -4,19 +4,34 @@ Object subclass: Game [
     |shoe dealerHand playerHands money numDecks deckType faceType currentBet currentHand quitting|
 
     Game class >> new [
-        ^super new initialize.
+        ^ super new initialize.
     ]
     
     Game >> initialize [
         quitting := false.
-        shoe := Shoe new.
+        numDecks := 1.
+        shoe := Shoe game: self.
     ]
 
     Game >> quitting [
-        ^quitting
+        ^ quitting
     ]
 
+    Game >> numDecks [
+        ^ numDecks
+    ]
+
+    Game >> shoe [
+        ^ shoe
+    ]
+
+    Game >> shuffle: aShoe [
+        
+    ]
+    
     Game >> dealNewHand [
         (true) ifTrue: [shoe shuffle].
+        
+        
     ]
 ]
