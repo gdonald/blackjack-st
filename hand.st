@@ -1,11 +1,12 @@
 Object subclass: Hand [
-    | cards played |
+    | game cards played |
 
-    Hand class >> new [
-        ^ super new initialize
+    Hand class >> game: aGame [
+        ^ super new initialize: aGame
     ]
 
-    Hand >> initialize [
+    Hand >> initialize: aGame [
+        game := aGame.
         played := false.
         cards := OrderedCollection new.
 

@@ -8,5 +8,7 @@ game := Game new.
 "]"
 
 (game shoe cards) do: [ :card |
-    Transcript show: card toString; cr.
+    Transcript show: (game drawCard: card); cr.
 ].
+
+Transcript show: (game shoe cards size) asString; cr.

@@ -1,26 +1,43 @@
 Object subclass: Card [
-    | game value suit |
+    | value suit |
 
-    " Card class >> game: aGame value: aValue suit: aSuit [
-        ^ self new initialize: aGame value: aValue suit: aSuit
-    ] "
-
-    Card class >> initializeWithGame: aGame value: aValue suit: aSuit [
-        ^ self new initialize: aGame value: aValue suit: aSuit
+    Card class >> initializeWithValue: aValue suit: aSuit [
+        ^ self new initialize: aValue suit: aSuit
     ]
     
-    Card >> initialize: aGame value: aValue suit: aSuit [
-        game := aGame.
+    Card >> initialize: aValue suit: aSuit [
         value := aValue.
         suit := aSuit.
+
         ^ self
     ]
 
-    Card >> toString [
-        ^ (Card faces at: value) at: suit
+    Card >> value [
+        ^ value
+    ]
+
+    Card >> suit [
+        ^ suit
     ]
 
     Card class >> faces [
+        ^ #(('A♠' 'A♥' 'A♣' 'A♦')
+            ('2♠' '2♥' '2♣' '2♦')
+            ('3♠' '3♥' '3♣' '3♦')
+            ('4♠' '4♥' '4♣' '4♦')
+            ('5♠' '5♥' '5♣' '5♦')
+            ('6♠' '6♥' '6♣' '6♦')
+            ('7♠' '7♥' '7♣' '7♦')
+            ('8♠' '8♥' '8♣' '8♦')
+            ('9♠' '9♥' '9♣' '9♦')
+            ('T♠' 'T♥' 'T♣' 'T♦')
+            ('J♠' 'J♥' 'J♣' 'J♦')
+            ('Q♠' 'Q♥' 'Q♣' 'Q♦')
+            ('K♠' 'K♥' 'K♣' 'K♦')
+            ('??'))
+    ]
+
+    Card class >> faces2 [
         ^ #(('🂡' '🂱' '🃁' '🃑')
             ('🂢' '🂲' '🃂' '🃒')
             ('🂣' '🂳' '🃃' '🃓')

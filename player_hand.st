@@ -1,12 +1,12 @@
 FileStream fileIn: 'hand.st'.
 
 Hand subclass: PlayerHand [
-    PlayerHand class >> new [
-        ^ super new initialize
+    PlayerHand class >> game: aGame [
+        ^ super new initialize: aGame
     ]
 
-    PlayerHand >> initialize [
-        super initialize.
+    PlayerHand >> initialize: aGame [
+        super initialize: aGame.
 
         ^ self
     ]
