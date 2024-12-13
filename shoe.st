@@ -1,7 +1,7 @@
 FileStream fileIn: 'card.st'.
 
 Object subclass: Shoe [
-    |game cards|
+    | game cards |
 
     Shoe class >> game: aGame [
         ^ self new initialize: aGame
@@ -51,17 +51,19 @@ Object subclass: Shoe [
     ]
 
     Shoe >> newShoeWithValues: values [
-        | totalCards suit value card |
+        | totalCards suit value |
+
         cards := OrderedCollection new.
         totalCards := game getTotalCards.
 
-        [ (cards size) < totalCards ] whileTrue: [
+        [(cards size) < totalCards] whileTrue: [
             (1 to: 4) do: [ :suit |
-                ((cards size) >= totalCards) ifTrue: [ ^ self ].
-
-                values do: [ :value |
-                    ((cards size) >= totalCards) ifTrue: [ ^ self ].
-                    cards add: (Card initializeWithValue: value suit: suit).
+                ((cards size) >= totalCards) ifFalse: [
+                    values do: [ :value |
+                        ((cards size) >= totalCards) ifFalse: [
+                            cards add: (Card initializeWithValue: value suit: suit).
+                        ].
+                    ].
                 ].
             ].
         ].
@@ -82,7 +84,7 @@ Object subclass: Shoe [
     ]
 
     Shoe >> newRegular [
-        self newShoeWithValues: ((1 to: 13) asArray).
+        self newShoeWithValues: (1 to: 13).
     ]
 
     Shoe >> newSevens [

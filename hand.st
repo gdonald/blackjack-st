@@ -1,5 +1,5 @@
 Object subclass: Hand [
-    |game cards played|
+    | game cards played |
 
     Hand class >> game: aGame [
         ^ super new initialize: aGame

@@ -2,15 +2,25 @@ FileStream fileIn: 'shoe.st'.
 FileStream fileIn: 'dealer_hand.st'.
 FileStream fileIn: 'player_hand.st'.
 
+Object subclass: CountMethod [
+    CountMethod class >> Soft [
+        ^ 0
+    ]
+
+    CountMethod class >> Hard [
+        ^ 1
+    ]
+]
+
 Object subclass: Game [
-    |shoe dealerHand playerHands money numDecks deckType faceType currentBet currentHand quitting|
+    | shoe dealerHand playerHands money numDecks deckType faceType currentBet currentHand quitting |
 
     Game class >> new [
         ^ super new initialize.
     ]
     
     Game >> initialize [
-        |playerHand|
+        | playerHand |
 
         numDecks := 1.
         deckType := 1.
@@ -45,6 +55,14 @@ Object subclass: Game [
 
     ]
 
+    Game >> dealerHand [
+        ^ dealerHand
+    ]
+
+    Game >> playerHands [
+        ^ playerHands
+    ]
+
     Game >> drawHands [
         self clear.
 
@@ -62,7 +80,7 @@ Object subclass: Game [
     ]
 
     Game class >> FormatMoney: money [
-        |dollars cents formattedCents|
+        | dollars cents formattedCents |
 
         dollars := (money // 100) asInteger.
         cents := (money \\ 100) asInteger.
@@ -70,11 +88,11 @@ Object subclass: Game [
             ifTrue: ['0', cents asString] 
             ifFalse: [cents asString].
         
-        ^ '$' , dollars asString , '.' , formattedCents
+        ^ dollars asString , '.' , formattedCents
     ]
     
     Game >> dealNewHand [
-        |playerHand|
+        | playerHand |
 
         (shoe needToShuffle) ifTrue: [shoe buildNewShoe: deckType].
 
