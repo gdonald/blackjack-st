@@ -1,5 +1,5 @@
 Object subclass: Hand [
-    | game cards played |
+    |game cards played|
 
     Hand class >> game: aGame [
         ^ super new initialize: aGame
@@ -13,21 +13,6 @@ Object subclass: Hand [
         ^ self
     ]
 
-    Hand >> toString [
-        | cardsString index cardCount |
-        cardsString := ''.
-        index := 1.
-        cardCount := cards size.
-
-        cards do: [:card |
-                   cardsString := cardsString, card toString.
-                   (index < cardCount) ifTrue: [cardsString := cardsString, ' '].
-                   index := index + 1.
-                  ].
-
-        ^ 'played: ', played printString, ' cards: [', cardsString, ']'
-    ]
-
     Hand >> cards [
         ^ cards
     ]
@@ -38,5 +23,9 @@ Object subclass: Hand [
 
     Hand >> played: aBoolean [
         played := aBoolean.
+    ]
+
+    Hand >> dealCard [
+        cards add: game shoe getNextCard.
     ]
 ]

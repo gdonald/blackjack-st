@@ -10,4 +10,20 @@ Hand subclass: DealerHand [
 
         ^ self
     ]
+
+    DealerHand >> drawHand [
+        |cardsString index cardCount|
+        
+        index := 1.
+        cardCount := cards size.
+        cardsString := ''.
+
+        cards do: [:card |
+                    cardsString := cardsString, (game drawCard: card).
+                    (index < cardCount) ifTrue: [cardsString := cardsString, ' '].
+                    index := index + 1.
+                  ].
+
+        ^ cardsString
+    ]
 ]

@@ -14,8 +14,40 @@ Object subclass: Shoe [
         ^ self
     ]
 
+    Shoe class >> ShuffleSpecs [
+        ^ #(80 81 82 84 86 89 92 95)
+    ]
+
     Shoe >> cards [
         ^ cards
+    ]
+
+    Shoe >> getNextCard [
+        | card |
+        card := cards first.
+        cards removeFirst.
+        ^ card
+    ]
+
+    Shoe >> needToShuffle [
+        | totalCards cardsDealt used |
+
+        cards isEmpty ifTrue: [ ^ true ].
+
+        totalCards := game getTotalCards.
+        cardsDealt := totalCards - cards size.
+        used := (cardsDealt / totalCards) * 100.0.
+
+        ^ used > (Shoe ShuffleSpecs at: game numDecks)
+    ]
+
+    Shoe >> buildNewShoe: deckType [
+        (deckType == 2) ifTrue: [^ self newAces].
+        (deckType == 3) ifTrue: [^ self newJacks].
+        (deckType == 4) ifTrue: [^ self newAcesJacks].
+        (deckType == 5) ifTrue: [^ self newSevens].
+        (deckType == 6) ifTrue: [^ self newEights].
+        self newRegular
     ]
 
     Shoe >> newShoeWithValues: values [
@@ -37,10 +69,28 @@ Object subclass: Shoe [
         self shuffle.
     ]
 
+    Shoe >> newAces [
+        self newShoeWithValues: #(1).
+    ]
+
+    Shoe >> newJacks [
+        self newShoeWithValues: #(11).
+    ]
+
+    Shoe >> newAcesJacks [
+        self newShoeWithValues: #(1 11).
+    ]
+
     Shoe >> newRegular [
-        | values |
-        values := (1 to: 13) asArray.
-        self newShoeWithValues: values.
+        self newShoeWithValues: ((1 to: 13) asArray).
+    ]
+
+    Shoe >> newSevens [
+        self newShoeWithValues: #(7).
+    ]
+
+    Shoe >> newEights [
+        self newShoeWithValues: #(8).
     ]
 
     Shoe >> shuffle [

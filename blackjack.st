@@ -7,8 +7,14 @@ game := Game new.
     game dealNewHand.
 "]"
 
-(game shoe cards) do: [ :card |
+" (game shoe cards) do: [ :card |
     Transcript show: (game drawCard: card); cr.
-].
+]. "
 
-Transcript show: (game shoe cards size) asString; cr.
+" Transcript show: (game shoe cards size) asString; cr. "
+
+" (game dealerHand cards) do: [ :card |
+    Transcript show: (game drawCard: card); cr.
+]. "
+
+game drawHands.

@@ -17,16 +17,7 @@ Object subclass: Game [
         faceType := 1.
         currentBet := 500.
         money := 10000.
-        
         shoe := Shoe game: self.
-        
-        dealerHand := DealerHand game: self.
-        
-        playerHand := PlayerHand game: self.
-        playerHands := OrderedCollection new.
-        playerHands add: playerHand.
-        currentHand := 1.
-
         quitting := false.
     ]
 
@@ -45,9 +36,59 @@ Object subclass: Game [
     Game >> shoe [
         ^ shoe
     ]
+
+    Game >> currentBet [
+        ^ currentBet
+    ]
+
+    Game >> clear [
+
+    ]
+
+    Game >> drawHands [
+        self clear.
+
+        Transcript show: ''; cr.
+        Transcript show: 'Dealer:'; cr.
+        Transcript show: dealerHand drawHand; cr; cr.
+
+        Transcript show: 'Player $'.
+        Transcript show: (Game FormatMoney: money).
+        Transcript show: ':'; cr.
+
+        playerHands doWithIndex: [ :playerHand :index |
+            Transcript show: (playerHand drawHand: index); cr.
+        ].
+    ]
+
+    Game class >> FormatMoney: money [
+        |dollars cents formattedCents|
+
+        dollars := (money // 100) asInteger.
+        cents := (money \\ 100) asInteger.
+        formattedCents := (cents < 10) 
+            ifTrue: ['0', cents asString] 
+            ifFalse: [cents asString].
+        
+        ^ '$' , dollars asString , '.' , formattedCents
+    ]
     
     Game >> dealNewHand [
-        (true) ifTrue: [shoe newRegular].
+        |playerHand|
+
+        (shoe needToShuffle) ifTrue: [shoe buildNewShoe: deckType].
+
+        playerHand := PlayerHand game: self.
+        playerHands := OrderedCollection new.
+        playerHands add: playerHand.
+        currentHand := 1.
+
+        dealerHand := DealerHand game: self.
+
+        playerHand dealCard.
+        dealerHand dealCard.
+        playerHand dealCard.
+        dealerHand dealCard.
     ]
 
     Game >> getTotalCards [
