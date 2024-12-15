@@ -1,5 +1,5 @@
 Object subclass: Hand [
-    | game cards played |
+    | game cards stood played |
 
     Hand class >> game: aGame [
         ^ super new initialize: aGame
@@ -7,6 +7,7 @@ Object subclass: Hand [
 
     Hand >> initialize: aGame [
         game := aGame.
+        stood := false.
         played := false.
         cards := OrderedCollection new.
 
@@ -27,5 +28,9 @@ Object subclass: Hand [
 
     Hand >> dealCard [
         cards add: game shoe getNextCard.
+    ]
+
+    Hand >> isBlackjack [
+        ^ (cards size = 2) and: [ (self getValue: CountMethod Hard) = 21 ]
     ]
 ]

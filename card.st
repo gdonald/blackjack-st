@@ -20,6 +20,14 @@ Object subclass: Card [
         ^ suit
     ]
 
+    Card >> isAce [
+        ^ value = 1
+    ]
+
+    Card >> isTen [
+        ^ value > 9
+    ]
+
     Card class >> faces [
         ^ #(('A♠' 'A♥' 'A♣' 'A♦')
             ('2♠' '2♥' '2♣' '2♦')

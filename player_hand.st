@@ -1,7 +1,8 @@
 FileStream fileIn: 'hand.st'.
+FileStream fileIn: 'hand_status.st'.
 
 Hand subclass: PlayerHand [
-    | bet |
+    | bet status paid |
 
     PlayerHand class >> game: aGame [
         ^ super new initialize: aGame
@@ -10,6 +11,8 @@ Hand subclass: PlayerHand [
     PlayerHand >> initialize: aGame [
         super initialize: aGame.
         bet := aGame currentBet.
+        status := HandStatus Unknown.
+        paid := false.
 
         ^ self
     ]
@@ -55,5 +58,62 @@ Hand subclass: PlayerHand [
         cardsString := cardsString, (self getValue: CountMethod Soft) asString.
 
         ^ cardsString
+    ]
+
+    PlayerHand >> isBusted [
+        ^ self getValue: CountMethod Soft > 21
+    ]
+
+    PlayerHand >> isDone [
+        | softValue hardValue |
+
+        softValue := self getValue: CountMethod Soft.
+        hardValue := self getValue: CountMethod Hard.
+
+        (played or: stood or: self isBlackjack or: self isBusted or: 21 = softValue or: 21 = hardValue) ifTrue: [
+            played := true.
+
+            paid ifFalse: [
+                (self isBusted) ifTrue: [
+                    paid := true.
+                    status := HandStatus Lost.
+                    game money: game money - bet.
+                ].
+            ].
+
+            ^ true.
+        ].
+
+        ^ false.
+    ]
+
+    PlayerHand >> canSplit [
+        (stood or: (game playerHands size >= PlayerHand maxPlayerHands)) ifTrue: [ ^ false ].
+
+        (game money < (game allBets + bet)) ifTrue: [ ^ false ].
+
+        (cards size = 2 and: [(cards at: 1) value = (cards at: 2) value]) ifTrue: [ ^ true ].
+
+        ^ false.
+    ]
+
+    PlayerHand >> canDbl [
+        (game money < (game allBets + bet)) ifTrue: [ ^ false ].
+
+        (stood or: (cards size != 2) or: self isBusted or: self isBlackjack) ifTrue: [ ^ false ].
+
+        ^ true.
+    ]
+
+    PlayerHand >> canStand [
+        (stood or: self isBusted or: self isBlackjack) ifTrue: [ ^ false ].
+
+        ^ true.
+    ]
+
+    PlayerHand >> canHit [
+        (played or: stood or: (self getValue: CountMethod Hard) = 21 or: self isBlackjack or: self isBusted) ifTrue: [ ^ false ].
+
+        ^ true.
     ]
 ]

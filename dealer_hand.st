@@ -23,6 +23,10 @@ Hand subclass: DealerHand [
         hideDownCard := aBoolean.
     ]
 
+    DealerHand >> upCardIsAce [
+        ^ (cards at: 1) isAce
+    ]
+
     DealerHand >> getValue: countMethod [
         | v total tmpV |
 
@@ -71,5 +75,9 @@ Hand subclass: DealerHand [
         cardsString := cardsString, (self getValue: CountMethod Soft) asString.
 
         ^ cardsString
+    ]
+
+    DealerHand >> isBusted [
+        ^ self getValue: CountMethod Soft > 21
     ]
 ]

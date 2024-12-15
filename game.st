@@ -1,16 +1,7 @@
 FileStream fileIn: 'shoe.st'.
 FileStream fileIn: 'dealer_hand.st'.
 FileStream fileIn: 'player_hand.st'.
-
-Object subclass: CountMethod [
-    CountMethod class >> Soft [
-        ^ 0
-    ]
-
-    CountMethod class >> Hard [
-        ^ 1
-    ]
-]
+FileStream fileIn: 'count_method.st'.
 
 Object subclass: Game [
     | shoe dealerHand playerHands money numDecks deckType faceType currentBet currentHand quitting |
@@ -33,6 +24,10 @@ Object subclass: Game [
 
     Game class >> CardsPerDeck [
         ^ 52
+    ]
+
+    Game class >> MaxPlayerHands [
+        ^ 7
     ]
 
     Game >> quitting [
