@@ -17,6 +17,14 @@ Hand subclass: PlayerHand [
         ^ self
     ]
 
+    PlayerHand >> paid [
+        ^ paid
+    ]
+
+    PlayerHand >> paid: aBoolean [
+        paid := aBoolean.
+    ]
+
     PlayerHand >> getValue: countMethod [
         | v total tmpV |
 
@@ -65,12 +73,12 @@ Hand subclass: PlayerHand [
     ]
 
     PlayerHand >> isDone [
-        | softValue hardValue |
+        " | softValue hardValue |
 
         softValue := self getValue: CountMethod Soft.
         hardValue := self getValue: CountMethod Hard.
 
-        (played or: stood or: self isBlackjack or: self isBusted or: 21 = softValue or: 21 = hardValue) ifTrue: [
+        ((played or: stood) or: (self isBlackjack or: self isBusted)) or: ([21 = softValue] or: [21 = hardValue]) ifTrue: [
             played := true.
 
             paid ifFalse: [
@@ -84,7 +92,9 @@ Hand subclass: PlayerHand [
             ^ true.
         ].
 
-        ^ false.
+        ^ false. "
+
+        ^ true.
     ]
 
     PlayerHand >> canSplit [
@@ -100,7 +110,7 @@ Hand subclass: PlayerHand [
     PlayerHand >> canDbl [
         (game money < (game allBets + bet)) ifTrue: [ ^ false ].
 
-        (stood or: (cards size != 2) or: self isBusted or: self isBlackjack) ifTrue: [ ^ false ].
+        (stood or: (cards size ~= 2) or: self isBusted or: self isBlackjack) ifTrue: [ ^ false ].
 
         ^ true.
     ]
@@ -115,5 +125,52 @@ Hand subclass: PlayerHand [
         (played or: stood or: (self getValue: CountMethod Hard) = 21 or: self isBlackjack or: self isBusted) ifTrue: [ ^ false ].
 
         ^ true.
+    ]
+
+    PlayerHand >> hit [
+        self dealCard.
+
+        (self isDone) ifTrue: [
+            self process.
+            ^ self.
+        ].
+
+        game drawHands.
+        (game playerHands at: game currentPlayerHand) getAction.
+    ]
+
+    PlayerHand >> dbl [
+        self dealCard.
+        played := true.
+        bet := bet * 2.
+
+        (self isDone) ifTrue: [
+            self process.
+        ].
+    ]
+
+    PlayerHand >> stand [
+        stood := true.
+        played := true.
+
+        (game moreHandsToPlay) ifTrue: [
+            game playMoreHands.
+            ^ self.
+        ].
+
+        game playDealerHand.
+        game drawHands.
+        game betOptions.
+    ]
+
+    PlayerHand >> process [
+        (game moreHandsToPlay) ifTrue: [
+            game playMoreHands.
+            ^ self.
+        ].
+
+        game playDealerHand.
+        game drawHands.
+        game betOptions.
     ]
 ]

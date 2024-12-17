@@ -23,7 +23,7 @@ Hand subclass: DealerHand [
         hideDownCard := aBoolean.
     ]
 
-    DealerHand >> upCardIsAce [
+    DealerHand >> upcardIsAce [
         ^ (cards at: 1) isAce
     ]
 
