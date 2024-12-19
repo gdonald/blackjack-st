@@ -17,6 +17,10 @@ Hand subclass: PlayerHand [
         ^ self
     ]
 
+    PlayerHand >> bet [
+        ^ bet
+    ]
+
     PlayerHand >> paid [
         ^ paid
     ]
@@ -69,18 +73,22 @@ Hand subclass: PlayerHand [
     ]
 
     PlayerHand >> isBusted [
-        ^ self getValue: CountMethod Soft > 21
+        ^ (self getValue: CountMethod Soft) > 21
     ]
 
     PlayerHand >> isDone [
-        " | softValue hardValue |
+        | softValue hardValue |
 
         softValue := self getValue: CountMethod Soft.
         hardValue := self getValue: CountMethod Hard.
 
-        ((played or: stood) or: (self isBlackjack or: self isBusted)) or: ([21 = softValue] or: [21 = hardValue]) ifTrue: [
-            played := true.
+        stood ifTrue: [ played := true ].
+        (self isBlackjack) ifTrue: [ played := true ].
+        (self isBusted) ifTrue: [ played := true ].
+        (softValue = 21) ifTrue: [ played := true ].
+        (hardValue = 21) ifTrue: [ played := true ].
 
+        played ifTrue: [
             paid ifFalse: [
                 (self isBusted) ifTrue: [
                     paid := true.
@@ -92,16 +100,13 @@ Hand subclass: PlayerHand [
             ^ true.
         ].
 
-        ^ false. "
-
-        ^ true.
+        ^ false.
     ]
 
     PlayerHand >> canSplit [
-        (stood or: (game playerHands size >= PlayerHand maxPlayerHands)) ifTrue: [ ^ false ].
-
+        stood ifTrue: [ ^ false ].
+        (game playerHands size >= Game MaxPlayerHands) ifTrue: [ ^ false ].
         (game money < (game allBets + bet)) ifTrue: [ ^ false ].
-
         (cards size = 2 and: [(cards at: 1) value = (cards at: 2) value]) ifTrue: [ ^ true ].
 
         ^ false.
@@ -110,19 +115,28 @@ Hand subclass: PlayerHand [
     PlayerHand >> canDbl [
         (game money < (game allBets + bet)) ifTrue: [ ^ false ].
 
-        (stood or: (cards size ~= 2) or: self isBusted or: self isBlackjack) ifTrue: [ ^ false ].
+        stood ifTrue: [ ^ false ].
+        (cards size ~= 2) ifTrue: [ ^ false ].
+        (self isBusted) ifTrue: [ ^ false ].
+        (self isBlackjack) ifTrue: [ ^ false ].
 
         ^ true.
     ]
 
     PlayerHand >> canStand [
-        (stood or: self isBusted or: self isBlackjack) ifTrue: [ ^ false ].
+        stood ifTrue: [ ^ false ].
+        (self isBusted) ifTrue: [ ^ false ].
+        (self isBlackjack) ifTrue: [ ^ false ].
 
         ^ true.
     ]
 
     PlayerHand >> canHit [
-        (played or: stood or: (self getValue: CountMethod Hard) = 21 or: self isBlackjack or: self isBusted) ifTrue: [ ^ false ].
+        played ifTrue: [ ^ false ].
+        stood ifTrue: [ ^ false ].
+        (self getValue: CountMethod Hard) = 21 ifTrue: [ ^ false ].
+        (self isBlackjack) ifTrue: [ ^ false ].
+        (self isBusted) ifTrue: [ ^ false ].
 
         ^ true.
     ]
@@ -136,7 +150,7 @@ Hand subclass: PlayerHand [
         ].
 
         game drawHands.
-        (game playerHands at: game currentPlayerHand) getAction.
+        (game playerHands at: game currentHand) getAction.
     ]
 
     PlayerHand >> dbl [
@@ -172,5 +186,43 @@ Hand subclass: PlayerHand [
         game playDealerHand.
         game drawHands.
         game betOptions.
+    ]
+
+    PlayerHand >> getAction [
+        | out br c |
+
+        out := ' '.
+
+        (self canHit) ifTrue: [ out := out, '(H) Hit  ' ].
+        (self canStand) ifTrue: [ out := out, '(S) Stand  ' ].
+        (self canSplit) ifTrue: [ out := out, '(P) Split  ' ].
+        (self canDbl) ifTrue: [ out := out, '(D) Double  ' ].
+
+        Transcript show: out; cr.
+
+        br := false.
+
+        [ br not ] whileTrue: [
+            c := (FileStream stdin next: 1) asLowercase.
+
+            (c = 'h') ifTrue: [
+                br := true.
+                self hit.
+            ].
+            (c = 's') ifTrue: [
+                br := true.
+                self stand.
+            ].
+            (c = 'p') ifTrue: [
+                (self canSplit) ifTrue: [
+                    br := true.
+                    self game splitCurrentHand.
+                ].
+            ].
+            (c = 'd') ifTrue: [
+                br := true.
+                self dbl.
+            ].
+        ].
     ]
 ]

@@ -22,8 +22,16 @@ Object subclass: Hand [
         ^ played
     ]
 
+    Hand >> stood [
+        ^ stood
+    ]
+
     Hand >> played: aBoolean [
         played := aBoolean.
+    ]
+
+    Hand >> stood: aBoolean [
+        stood := aBoolean.
     ]
 
     Hand >> dealCard [

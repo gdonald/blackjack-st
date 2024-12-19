@@ -9,7 +9,7 @@ Object subclass: Game [
     Game class >> new [
         ^ super new initialize.
     ]
-    
+
     Game >> initialize [
         | playerHand |
 
@@ -20,6 +20,10 @@ Object subclass: Game [
         money := 10000.
         shoe := Shoe game: self.
         quitting := false.
+    ]
+
+    Game class >> SaveFile [
+        ^ 'blackjack.txt'
     ]
 
     Game class >> CardsPerDeck [
@@ -38,6 +42,14 @@ Object subclass: Game [
         ^ 10000000
     ]
 
+    Game >> money [
+        ^ money
+    ]
+
+    Game >> money: aMoney [
+        money := aMoney.
+    ]
+
     Game >> quitting [
         ^ quitting
     ]
@@ -52,6 +64,10 @@ Object subclass: Game [
 
     Game >> currentBet [
         ^ currentBet
+    ]
+
+    Game >> currentHand [
+        ^ currentHand
     ]
 
     Game >> clear [
@@ -149,8 +165,8 @@ Object subclass: Game [
         | bets |
         bets := 0.
 
-        playerHands do: [ :hand |
-            bets := bets + hand bet.
+        playerHands do: [ :playerHand |
+            bets := bets + playerHand bet.
         ].
 
         ^ bets.
@@ -262,6 +278,16 @@ Object subclass: Game [
         self saveGame.
     ]
 
+    Game >> needToPlayDealerHand [
+        | playerHand |
+
+        playerHands do: [ :playerHand |
+            (playerHand isBusted or: [ playerHand isBlackjack ]) ifFalse: [ ^ true ].
+        ].
+
+        ^ false.
+    ]
+
     Game >> playDealerHand [
         | softCount hardCount |
 
@@ -280,10 +306,12 @@ Object subclass: Game [
         softCount := dealerHand getValue: CountMethod Soft.
         hardCount := dealerHand getValue: CountMethod Hard.
 
-        [ (softCount < 18) and: (hardCount < 17) ] whileTrue: [
-            dealerHand dealCard.
-            softCount := dealerHand getValue: CountMethod Soft.
-            hardCount := dealerHand getValue: CountMethod Hard.
+        (softCount < 18 and: [hardCount < 17]) ifTrue: [
+            [ (softCount < 18 and: [hardCount < 17]) ] whileTrue: [
+                dealerHand dealCard.
+                softCount := dealerHand getValue: CountMethod Soft.
+                hardCount := dealerHand getValue: CountMethod Hard.
+            ].
         ].
 
         dealerHand played: true.
@@ -294,7 +322,7 @@ Object subclass: Game [
         | file |
 
         [ 
-            file := FileStream fileNamed: Game saveFile mode: 'w'.
+            file := FileStream fileNamed: Game SaveFile mode: 'w'.
         ] on: Error do: [ :ex | file := nil ].
 
         file ifNotNil: [
@@ -318,7 +346,9 @@ Object subclass: Game [
         [ br not ] whileTrue: [
             c := (FileStream stdin next: 1) asLowercase.
 
-            (c = 'd') ifTrue: [ br := true ].
+            (c = 'd') ifTrue: [
+                br := true
+            ].
             (c = 'b') ifTrue: [
                 br := true.
                 self getNewBet.
@@ -333,5 +363,9 @@ Object subclass: Game [
                 self clear.
             ].
         ].
+    ]
+
+    Game >> moreHandsToPlay [
+        ^ currentHand < (playerHands size).
     ]
 ]
