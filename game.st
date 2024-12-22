@@ -70,6 +70,10 @@ Object subclass: Game [
         ^ currentHand
     ]
 
+    Game >> currentBet: aBet [
+        currentBet := aBet.
+    ]
+
     Game >> clear [
 
     ]
@@ -86,15 +90,15 @@ Object subclass: Game [
         self clear.
 
         Transcript show: ''; cr.
-        Transcript show: 'Dealer:'; cr.
+        Transcript show: ' Dealer:'; cr.
         Transcript show: dealerHand drawHand; cr; cr.
 
-        Transcript show: 'Player $'.
+        Transcript show: ' Player $'.
         Transcript show: (Game FormatMoney: money).
         Transcript show: ':'; cr.
 
         playerHands doWithIndex: [ :playerHand :index |
-            Transcript show: (playerHand drawHand: index); cr.
+            Transcript show: (playerHand drawHand: index); cr; cr.
         ].
     ]
 
@@ -108,6 +112,10 @@ Object subclass: Game [
             ifFalse: [cents asString].
         
         ^ dollars asString , '.' , formattedCents
+    ]
+
+    Game >> formatMoney: money [
+        ^ Game FormatMoney: money
     ]
     
     Game >> dealNewHand [
@@ -140,7 +148,7 @@ Object subclass: Game [
         ((playerHands at: 1) isDone) ifTrue: [
             self payHands.
             self drawHands.
-            self betOptions.
+            self gameOptions.
             ^ self.
         ].
 
@@ -200,7 +208,7 @@ Object subclass: Game [
             dealerHand played: true.
             self payHands.
             self drawHands.
-            self betOptions.
+            self gameOptions.
             ^ self.
         ].
 
@@ -209,7 +217,7 @@ Object subclass: Game [
         (playerHand isDone) ifTrue: [
             self playDealerHand.
             self drawHands.
-            self betOptions.
+            self gameOptions.
             ^ self.
         ].
 
@@ -229,7 +237,7 @@ Object subclass: Game [
         self money: money - (playerHand bet).
 
         self drawHands.
-        self betOptions.
+        self gameOptions.
     ]
 
     Game >> normalizeBet [
@@ -258,7 +266,7 @@ Object subclass: Game [
             playerHand paid: true.
             phv := playerHand getValue: CountMethod Soft.
 
-            " (dhb = true or: (phv > dhv)) ifTrue: [
+            (dhb = true or: [phv > dhv]) ifTrue: [
                 (playerHand isBlackjack) ifTrue: [
                     playerHand bet: playerHand bet * 1.5.
                 ].
@@ -271,7 +279,7 @@ Object subclass: Game [
                 ] ifFalse: [
                     playerHand status: HandStatus Push.
                 ].
-            ]. "
+            ].
         ].
 
         self normalizeBet.
@@ -337,7 +345,7 @@ Object subclass: Game [
         ].
     ]
 
-    Game >> betOptions [
+    Game >> gameOptions [
         | br c |
 
         Transcript show: ' (D) Deal Hand  (B) Change Bet  (O) Options  (Q) Quit'; cr.
@@ -347,15 +355,15 @@ Object subclass: Game [
             c := (FileStream stdin next: 1) asLowercase.
 
             (c = 'd') ifTrue: [
-                br := true
+                br := true.
             ].
             (c = 'b') ifTrue: [
                 br := true.
-                self getNewBet.
+                self betOptions.
             ].
             (c = 'o') ifTrue: [
                 br := true.
-                self gameOptions.
+                self configOptions.
             ].
             (c = 'q') ifTrue: [
                 br := true.
@@ -367,5 +375,38 @@ Object subclass: Game [
 
     Game >> moreHandsToPlay [
         ^ currentHand < (playerHands size).
+    ]
+
+    Game >> betOptions [
+        | br c |
+
+        self clear.
+        self drawHands.
+
+        Transcript show: ' (1) $5  (2) $10  (3) $25  (4) $100'; cr.
+        br := false.
+
+        [ br not ] whileTrue: [
+            c := (FileStream stdin next: 1) asInteger.
+
+            (c = 1) ifTrue: [
+                br := true.
+                currentBet := 500.
+            ].
+            (c = 2) ifTrue: [
+                br := true.
+                currentBet := 1000.
+            ].
+            (c = 3) ifTrue: [
+                br := true.
+                currentBet := 2500.
+            ].
+            (c = 4) ifTrue: [
+                br := true.
+                currentBet := 10000.
+            ].
+        ].
+
+        self normalizeBet.
     ]
 ]

@@ -6,7 +6,7 @@ Console Blackjack written in GNU Smalltalk
 
 `brew install gnu-smalltalk`
 
-`gst blackjack.st`
+`gst --quiet blackjack.st`
 
 ### Status
 

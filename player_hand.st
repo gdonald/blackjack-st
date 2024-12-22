@@ -29,6 +29,10 @@ Hand subclass: PlayerHand [
         paid := aBoolean.
     ]
 
+    PlayerHand >> status: aStatus [
+        status := aStatus.
+    ]
+
     PlayerHand >> getValue: countMethod [
         | v total tmpV |
 
@@ -53,12 +57,12 @@ Hand subclass: PlayerHand [
         ^ total
     ]
 
-    PlayerHand >> drawHand: currentCardIndex [
+    PlayerHand >> drawHand: currentHand [
         | cardsString index cardCount |
         
         index := 1.
         cardCount := cards size.
-        cardsString := ''.
+        cardsString := ' '.
 
         cards do: [:card |
                     cardsString := cardsString, (game drawCard: card).
@@ -68,6 +72,40 @@ Hand subclass: PlayerHand [
 
         cardsString := cardsString, ' ⇒  '.
         cardsString := cardsString, (self getValue: CountMethod Soft) asString.
+        cardsString := cardsString, '  '.
+
+        status = HandStatus Lost ifTrue: [
+            cardsString := cardsString, '-'.
+        ].
+        status = HandStatus Won ifTrue: [
+            cardsString := cardsString, '+'.
+        ].
+        cardsString := cardsString, '$', (game formatMoney: bet).
+
+        ((played not) and: [currentHand = game currentHand]) ifTrue: [
+            cardsString := cardsString, ' ⇐'.
+        ].
+        cardsString := cardsString, '  '.
+
+        status = HandStatus Lost ifTrue: [
+            self isBusted ifTrue: [
+                cardsString := cardsString, 'Busted!'.
+            ] ifFalse: [
+                cardsString := cardsString, 'Lose!'.
+            ].
+        ].
+
+        status = HandStatus Won ifTrue: [
+            self isBlackjack ifTrue: [
+                cardsString := cardsString, 'Blackjack!'.
+            ] ifFalse: [
+                cardsString := cardsString, 'Win!'.
+            ].
+        ].
+
+        status = HandStatus Push ifTrue: [
+            cardsString := cardsString, 'Push!'.
+        ].
 
         ^ cardsString
     ]
@@ -174,7 +212,7 @@ Hand subclass: PlayerHand [
 
         game playDealerHand.
         game drawHands.
-        game betOptions.
+        game gameOptions.
     ]
 
     PlayerHand >> process [
@@ -185,7 +223,7 @@ Hand subclass: PlayerHand [
 
         game playDealerHand.
         game drawHands.
-        game betOptions.
+        game gameOptions.
     ]
 
     PlayerHand >> getAction [

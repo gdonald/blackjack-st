@@ -58,7 +58,7 @@ Hand subclass: DealerHand [
 
         index := 1.
         cardCount := cards size.
-        cardsString := ''.
+        cardsString := ' '.
 
         cards do: [:card |
                     (hideDownCard and: [index = 2]) ifTrue: [
