@@ -41,12 +41,12 @@ Object subclass: Shoe [
         ^ used > (Shoe ShuffleSpecs at: game numDecks)
     ]
 
-    Shoe >> buildNewShoe: deckType [
-        (deckType == 2) ifTrue: [^ self newAces].
-        (deckType == 3) ifTrue: [^ self newJacks].
-        (deckType == 4) ifTrue: [^ self newAcesJacks].
-        (deckType == 5) ifTrue: [^ self newSevens].
-        (deckType == 6) ifTrue: [^ self newEights].
+    Shoe >> buildNewShoe [
+        (game deckType = 2) ifTrue: [ ^ self newAces ].
+        (game deckType = 3) ifTrue: [ ^ self newJacks ].
+        (game deckType = 4) ifTrue: [ ^ self newAcesJacks ].
+        (game deckType = 5) ifTrue: [ ^ self newSevens ].
+        (game deckType = 6) ifTrue: [ ^ self newEights ].
         self newRegular
     ]
 

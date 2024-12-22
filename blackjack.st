@@ -1,8 +1,2 @@
 FileStream fileIn: 'game.st'.
-
-| game |
-game := Game new.
-
-[ game quitting ] whileFalse: [
-    game dealNewHand.
-]
+Game Run.

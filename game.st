@@ -22,68 +22,62 @@ Object subclass: Game [
         quitting := false.
     ]
 
-    Game class >> SaveFile [
-        ^ 'blackjack.txt'
+    Game class >> Run [
+        | game |
+        game := Game new.
+
+        [ game quitting ]
+            whileFalse: [ game dealNewHand. ].
     ]
 
-    Game class >> CardsPerDeck [
-        ^ 52
-    ]
+    Game class >> SaveFile [ ^ 'blackjack.txt' ]
+    Game class >> CardsPerDeck [ ^ 52 ]
+    Game class >> MaxPlayerHands [ ^ 7 ]
+    Game class >> MinBet [ ^ 500 ]
+    Game class >> MaxBet [ ^ 10000000 ]
 
-    Game class >> MaxPlayerHands [
-        ^ 7
-    ]
+    Game >> money [ ^ money ]
+    Game >> money: aMoney [ money := aMoney ]
 
-    Game class >> MinBet [
-        ^ 500
-    ]
+    Game >> quitting [ ^ quitting ]
 
-    Game class >> MaxBet [
-        ^ 10000000
-    ]
+    Game >> numDecks [ ^ numDecks ]
+    Game >> numDecks: aNumDecks [ numDecks := aNumDecks ]
 
-    Game >> money [
-        ^ money
-    ]
+    Game >> shoe [ ^ shoe ]
 
-    Game >> money: aMoney [
-        money := aMoney.
-    ]
+    Game >> currentBet [ ^ currentBet ]
+    Game >> currentBet: aBet [ currentBet := aBet ]
 
-    Game >> quitting [
-        ^ quitting
-    ]
+    Game >> currentHand [ ^ currentHand ]
 
-    Game >> numDecks [
-        ^ numDecks
-    ]
+    Game >> deckType [ ^ deckType ]
+    Game >> deckType: aDeckType [ deckType := aDeckType ]
 
-    Game >> shoe [
-        ^ shoe
-    ]
-
-    Game >> currentBet [
-        ^ currentBet
-    ]
-
-    Game >> currentHand [
-        ^ currentHand
-    ]
-
-    Game >> currentBet: aBet [
-        currentBet := aBet.
-    ]
+    Game >> faceType [ ^ faceType ]
+    Game >> faceType: aFaceType [ faceType := aFaceType ]
 
     Game >> clear [
 
     ]
 
-    Game >> dealerHand [
-        ^ dealerHand
+    Game >> dealerHand [ ^ dealerHand ]
+    Game >> playerHands [ ^ playerHands ]
+
+    Game class >> FormatMoney: money [
+        | dollars cents formattedCents |
+
+        dollars := (money // 100) asInteger.
+        cents := (money \\ 100) asInteger.
+        formattedCents := (cents < 10)
+            ifTrue: ['0', cents asString]
+            ifFalse: [cents asString].
+
+        ^ dollars asString , '.' , formattedCents
     ]
 
-    Game >> playerHands [
-        ^ playerHands
+    Game >> formatMoney: money [
+        ^ Game FormatMoney: money
     ]
 
     Game >> drawHands [
@@ -101,27 +95,11 @@ Object subclass: Game [
             Transcript show: (playerHand drawHand: index); cr; cr.
         ].
     ]
-
-    Game class >> FormatMoney: money [
-        | dollars cents formattedCents |
-
-        dollars := (money // 100) asInteger.
-        cents := (money \\ 100) asInteger.
-        formattedCents := (cents < 10) 
-            ifTrue: ['0', cents asString] 
-            ifFalse: [cents asString].
-        
-        ^ dollars asString , '.' , formattedCents
-    ]
-
-    Game >> formatMoney: money [
-        ^ Game FormatMoney: money
-    ]
     
     Game >> dealNewHand [
         | playerHand |
 
-        (shoe needToShuffle) ifTrue: [shoe buildNewShoe: deckType].
+        (shoe needToShuffle) ifTrue: [ shoe buildNewShoe ].
 
         playerHand := PlayerHand game: self.
         playerHands := OrderedCollection new.
@@ -343,6 +321,8 @@ Object subclass: Game [
             ]).
             file close.
         ].
+
+        ^ true.
     ]
 
     Game >> gameOptions [
@@ -373,6 +353,104 @@ Object subclass: Game [
         ].
     ]
 
+    Game >> configOptions [
+        | br c |
+
+        self clear.
+        self drawHands.
+
+        Transcript show: ' (N) Number of Decks  (T) Deck Type  (F) Face Type  (B) Back'; cr.
+        br := false.
+
+        [ br not ] whileTrue: [
+            c := (FileStream stdin next: 1) asLowercase.
+
+            (c = 'n') ifTrue: [
+                br := true.
+                self numDecksOptions.
+            ].
+            (c = 't') ifTrue: [
+                br := true.
+                self deckTypeOptions.
+            ].
+            (c = 'f') ifTrue: [
+                br := true.
+                self faceTypeOptions.
+            ].
+            (c = 'b') ifTrue: [
+                br := true.
+                self clear.
+                self drawHands.
+                self gameOptions.
+            ].
+        ].
+    ]
+
+    Game >> deckTypeOptions [
+        | c |
+
+        self clear.
+        self drawHands.
+
+        Transcript show: ' (1) Regular  (2) Aces  (3) Jacks  (4) Aces & Jacks  (5) Sevens  (6) Eights'; cr.
+        c := self getChar.
+
+        ('123456' includes: c)
+            ifTrue: [
+                self deckType: (c digitValue).
+                deckType > 1 ifTrue: [ self numDecks: 8. ].
+                self saveGame.
+                shoe buildNewShoe.
+                self dealNewHand.
+            ]
+            ifFalse: [
+                self deckTypeOptions.
+            ].
+    ]
+
+    Game >> faceTypeOptions [
+        | c |
+
+        self clear.
+        self drawHands.
+
+        Transcript show: ' (1) A♠  (2) 🂡'; cr.
+        c := self getChar.
+
+        ('12' includes: c)
+            ifTrue: [
+                self faceType: (c digitValue).
+                self saveGame.
+                self dealNewHand.
+            ]
+            ifFalse: [
+                self faceTypeOptions.
+            ].
+    ]
+
+    Game >> numDecksOptions [
+        | c |
+
+        self clear.
+        self drawHands.
+
+        Transcript show: ' Number of Decks: '.
+        Transcript show: numDecks asString.
+        Transcript show: '  Enter New Number of Decks (1-8):'; cr.
+        c := self getChar.
+
+        ('12345678' includes: c)
+            ifTrue: [
+                self numDecks: (c digitValue).
+                self saveGame.
+                shoe buildNewShoe.
+                self dealNewHand.
+            ]
+            ifFalse: [
+                self numDecksOptions.
+            ].
+    ]
+
     Game >> moreHandsToPlay [
         ^ currentHand < (playerHands size).
     ]
@@ -380,11 +458,12 @@ Object subclass: Game [
     Game >> betOptions [
         | br c |
 
+        br := false.
+
         self clear.
         self drawHands.
 
         Transcript show: ' (1) $5  (2) $10  (3) $25  (4) $100'; cr.
-        br := false.
 
         [ br not ] whileTrue: [
             c := (FileStream stdin next: 1) asInteger.
@@ -408,5 +487,12 @@ Object subclass: Game [
         ].
 
         self normalizeBet.
+    ]
+
+    Game >> getChar [
+        [ FileStream stdin peek isSeparator ]
+            whileTrue: [ FileStream stdin next ]. 
+
+        ^ (FileStream stdin next: 1) first.
     ]
 ]

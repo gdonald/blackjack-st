@@ -34,16 +34,18 @@ Hand subclass: DealerHand [
         total := 0.
 
         cards doWithIndex: [ :card :index |
-            (hideDownCard and: [index = 2]) ifFalse: [
-                tmpV := card value.
-                v := tmpV > 9 ifTrue: [ 10 ] ifFalse: [ tmpV ].
+            (hideDownCard and: [index = 2])
+                ifFalse: [
+                    tmpV := card value.
+                    v := tmpV > 9 ifTrue: [ 10 ] ifFalse: [ tmpV ].
 
-                ((countMethod = CountMethod Soft) and: [ v = 1 and: [ total < 11 ] ]) ifTrue: [
-                    v := 11.
+                    ((countMethod = CountMethod Soft) and: [ v = 1 and: [ total < 11 ] ])
+                        ifTrue: [
+                            v := 11.
+                        ].
+
+                    total := total + v.
                 ].
-
-                total := total + v.
-            ].
         ].
         
         ((countMethod = CountMethod Soft) and: [ total > 21 ]) ifTrue: [
@@ -61,11 +63,13 @@ Hand subclass: DealerHand [
         cardsString := ' '.
 
         cards do: [:card |
-                    (hideDownCard and: [index = 2]) ifTrue: [
-                        cardToDraw := Card initializeWithValue: 14 suit: 1.
-                    ] ifFalse: [
-                        cardToDraw := card.
-                    ].
+                    (hideDownCard and: [index = 2])
+                        ifTrue: [
+                            cardToDraw := Card initializeWithValue: 14 suit: 1.
+                        ]
+                        ifFalse: [
+                            cardToDraw := card.
+                        ].
                     cardsString := cardsString, (game drawCard: cardToDraw).
                     cardsString := cardsString, ' '.
                     index := index + 1.
@@ -78,6 +82,6 @@ Hand subclass: DealerHand [
     ]
 
     DealerHand >> isBusted [
-        ^ self getValue: CountMethod Soft > 21
+        ^ (self getValue: (CountMethod Soft)) > 21
     ]
 ]
