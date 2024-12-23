@@ -38,9 +38,10 @@ Hand subclass: PlayerHand [
             tmpV := card value.
             v := tmpV > 9 ifTrue: [ 10 ] ifFalse: [ tmpV ].
 
-            ((countMethod = CountMethod Soft) and: [ v = 1 and: [ total < 11 ] ]) ifTrue: [
-                v := 11.
-            ].
+            ((countMethod = CountMethod Soft) and: [ v = 1 and: [ total < 11 ] ])
+                ifTrue: [
+                    v := 11.
+                ].
 
             total := total + v.
         ].
@@ -69,38 +70,46 @@ Hand subclass: PlayerHand [
         cardsString := cardsString, (self getValue: CountMethod Soft) asString.
         cardsString := cardsString, '  '.
 
-        status = HandStatus Lost ifTrue: [
-            cardsString := cardsString, '-'.
-        ].
-        status = HandStatus Won ifTrue: [
-            cardsString := cardsString, '+'.
-        ].
+        (status = HandStatus Lost)
+            ifTrue: [
+                cardsString := cardsString, '-'.
+            ].
+        (status = HandStatus Won)
+            ifTrue: [
+                cardsString := cardsString, '+'.
+            ].
         cardsString := cardsString, '$', (game formatMoney: bet).
 
-        ((played not) and: [currentHand = game currentHand]) ifTrue: [
-            cardsString := cardsString, ' ⇐'.
-        ].
+        ((played not) and: [currentHand = game currentHand])
+            ifTrue: [
+                cardsString := cardsString, ' ⇐'.
+            ].
         cardsString := cardsString, '  '.
 
-        status = HandStatus Lost ifTrue: [
-            self isBusted ifTrue: [
-                cardsString := cardsString, 'Busted!'.
-            ] ifFalse: [
-                cardsString := cardsString, 'Lose!'.
+        (status = HandStatus Lost)
+            ifTrue: [
+                (self isBusted)
+                    ifTrue: [
+                        cardsString := cardsString, 'Busted!'.
+                    ] ifFalse: [
+                        cardsString := cardsString, 'Lose!'.
+                    ].
             ].
-        ].
 
-        status = HandStatus Won ifTrue: [
-            self isBlackjack ifTrue: [
-                cardsString := cardsString, 'Blackjack!'.
-            ] ifFalse: [
-                cardsString := cardsString, 'Win!'.
+        (status = HandStatus Won)
+            ifTrue: [
+                (self isBlackjack)
+                    ifTrue: [
+                        cardsString := cardsString, 'Blackjack!'.
+                    ] ifFalse: [
+                        cardsString := cardsString, 'Win!'.
+                    ].
             ].
-        ].
 
-        status = HandStatus Push ifTrue: [
-            cardsString := cardsString, 'Push!'.
-        ].
+        (status = HandStatus Push)
+            ifTrue: [
+                cardsString := cardsString, 'Push!'.
+            ].
 
         ^ cardsString
     ]
@@ -123,11 +132,12 @@ Hand subclass: PlayerHand [
 
         played ifTrue: [
             paid ifFalse: [
-                (self isBusted) ifTrue: [
-                    paid := true.
-                    status := HandStatus Lost.
-                    game money: game money - bet.
-                ].
+                (self isBusted)
+                    ifTrue: [
+                        paid := true.
+                        status := HandStatus Lost.
+                        game money: game money - bet.
+                    ].
             ].
 
             ^ true.
@@ -177,10 +187,11 @@ Hand subclass: PlayerHand [
     PlayerHand >> hit [
         self dealCard.
 
-        (self isDone) ifTrue: [
-            self process.
-            ^ self.
-        ].
+        (self isDone)
+            ifTrue: [
+                self process.
+                ^ self.
+            ].
 
         game drawHands.
         (game playerHands at: game currentHand) getAction.
@@ -191,19 +202,21 @@ Hand subclass: PlayerHand [
         played := true.
         bet := bet * 2.
 
-        (self isDone) ifTrue: [
-            self process.
-        ].
+        (self isDone)
+            ifTrue: [
+                self process.
+            ].
     ]
 
     PlayerHand >> stand [
         stood := true.
         played := true.
 
-        (game moreHandsToPlay) ifTrue: [
-            game playMoreHands.
-            ^ self.
-        ].
+        (game moreHandsToPlay)
+            ifTrue: [
+                game playMoreHands.
+                ^ self.
+            ].
 
         game playDealerHand.
         game drawHands.
@@ -211,10 +224,11 @@ Hand subclass: PlayerHand [
     ]
 
     PlayerHand >> process [
-        (game moreHandsToPlay) ifTrue: [
-            game playMoreHands.
-            ^ self.
-        ].
+        (game moreHandsToPlay)
+            ifTrue: [
+                game playMoreHands.
+                ^ self.
+            ].
 
         game playDealerHand.
         game drawHands.
@@ -227,33 +241,39 @@ Hand subclass: PlayerHand [
         br := false.
 
         out := ' '.
-
-        (self canHit) ifTrue: [ out := out, '(H) Hit  ' ].
+        (self canHit)   ifTrue: [ out := out, '(H) Hit  ' ].
         (self canStand) ifTrue: [ out := out, '(S) Stand  ' ].
         (self canSplit) ifTrue: [ out := out, '(P) Split  ' ].
-        (self canDbl) ifTrue: [ out := out, '(D) Double  ' ].
+        (self canDbl)   ifTrue: [ out := out, '(D) Double  ' ].
 
         Transcript show: out; cr.
 
         [ br not ] whileTrue: [
             c := (FileStream stdin next: 1) asLowercase.
 
-            ((c = 'h') and: [self canHit]) ifTrue: [
-                br := true.
-                self hit.
-            ].
-            ((c = 's') and: [self canStand]) ifTrue: [
-                br := true.
-                self stand.
-            ].
-            ((c = 'p') and: [self canSplit]) ifTrue: [
-                br := true.
-                game splitCurrentHand.
-            ].
-            ((c = 'd') and: [self canDbl]) ifTrue: [
-                br := true.
-                self dbl.
-            ].
+            ((c = 'h') and: [self canHit])
+                ifTrue: [
+                    br := true.
+                    self hit.
+                ].
+            
+            ((c = 's') and: [self canStand])
+                ifTrue: [
+                    br := true.
+                    self stand.
+                ].
+            
+            ((c = 'p') and: [self canSplit])
+                ifTrue: [
+                    br := true.
+                    game splitCurrentHand.
+                ].
+            
+            ((c = 'd') and: [self canDbl])
+                ifTrue: [
+                    br := true.
+                    self dbl.
+                ].
         ].
     ]
 ]

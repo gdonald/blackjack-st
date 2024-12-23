@@ -14,25 +14,13 @@ Object subclass: Hand [
         ^ self
     ]
 
-    Hand >> cards [
-        ^ cards
-    ]
+    Hand >> cards [ ^ cards ]
 
-    Hand >> played [
-        ^ played
-    ]
+    Hand >> played [ ^ played ]
+    Hand >> played: aBoolean [ played := aBoolean ]
 
-    Hand >> stood [
-        ^ stood
-    ]
-
-    Hand >> played: aBoolean [
-        played := aBoolean.
-    ]
-
-    Hand >> stood: aBoolean [
-        stood := aBoolean.
-    ]
+    Hand >> stood [ ^ stood ]
+    Hand >> stood: aBoolean [ stood := aBoolean ]
 
     Hand >> dealCard [
         cards add: game shoe getNextCard.

@@ -12,21 +12,11 @@ Object subclass: Card [
         ^ self
     ]
 
-    Card >> value [
-        ^ value
-    ]
+    Card >> value [ ^ value ]
+    Card >> suit [ ^ suit ]
 
-    Card >> suit [
-        ^ suit
-    ]
-
-    Card >> isAce [
-        ^ value = 1
-    ]
-
-    Card >> isTen [
-        ^ value > 9
-    ]
+    Card >> isAce [ ^ value = 1 ]
+    Card >> isTen [ ^ value > 9 ]
 
     Card class >> faces [
         ^ #(('A♠' 'A♥' 'A♣' 'A♦')

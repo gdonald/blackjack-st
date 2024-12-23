@@ -18,9 +18,7 @@ Object subclass: Shoe [
         ^ #(80 81 82 84 86 89 92 95)
     ]
 
-    Shoe >> cards [
-        ^ cards
-    ]
+    Shoe >> cards [ ^ cards ]
 
     Shoe >> getNextCard [
         | card |
@@ -47,6 +45,7 @@ Object subclass: Shoe [
         (game deckType = 4) ifTrue: [ ^ self newAcesJacks ].
         (game deckType = 5) ifTrue: [ ^ self newSevens ].
         (game deckType = 6) ifTrue: [ ^ self newEights ].
+        
         self newRegular
     ]
 
@@ -58,42 +57,27 @@ Object subclass: Shoe [
 
         [(cards size) < totalCards] whileTrue: [
             (1 to: 4) do: [ :suit |
-                ((cards size) >= totalCards) ifFalse: [
-                    values do: [ :value |
-                        ((cards size) >= totalCards) ifFalse: [
-                            cards add: (Card initializeWithValue: value suit: suit).
+                ((cards size) >= totalCards)
+                    ifFalse: [
+                        values do: [ :value |
+                            ((cards size) >= totalCards)
+                                ifFalse: [
+                                    cards add: (Card initializeWithValue: value suit: suit).
+                                ].
                         ].
                     ].
-                ].
             ].
         ].
 
         self shuffle.
     ]
 
-    Shoe >> newAces [
-        self newShoeWithValues: #(1).
-    ]
-
-    Shoe >> newJacks [
-        self newShoeWithValues: #(11).
-    ]
-
-    Shoe >> newAcesJacks [
-        self newShoeWithValues: #(1 11).
-    ]
-
-    Shoe >> newRegular [
-        self newShoeWithValues: (1 to: 13).
-    ]
-
-    Shoe >> newSevens [
-        self newShoeWithValues: #(7).
-    ]
-
-    Shoe >> newEights [
-        self newShoeWithValues: #(8).
-    ]
+    Shoe >> newAces      [ self newShoeWithValues: #(1) ]
+    Shoe >> newJacks     [ self newShoeWithValues: #(11) ]
+    Shoe >> newAcesJacks [ self newShoeWithValues: #(1 11) ]
+    Shoe >> newRegular   [ self newShoeWithValues: (1 to: 13) ]
+    Shoe >> newSevens    [ self newShoeWithValues: #(7) ]
+    Shoe >> newEights    [ self newShoeWithValues: #(8) ]
 
     Shoe >> shuffle [
         | size randIndex tmp |

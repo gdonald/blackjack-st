@@ -15,13 +15,8 @@ Hand subclass: DealerHand [
         ^ self
     ]
 
-    DealerHand >> hideDownCard [
-        ^ hideDownCard
-    ]
-
-    DealerHand >> hideDownCard: aBoolean [
-        hideDownCard := aBoolean.
-    ]
+    DealerHand >> hideDownCard [ ^ hideDownCard ]
+    DealerHand >> hideDownCard: aBoolean [ hideDownCard := aBoolean ]
 
     DealerHand >> upcardIsAce [
         ^ (cards at: 1) isAce
@@ -48,9 +43,10 @@ Hand subclass: DealerHand [
                 ].
         ].
         
-        ((countMethod = CountMethod Soft) and: [ total > 21 ]) ifTrue: [
-            ^ self getValue: CountMethod Hard.
-        ].        
+        ((countMethod = CountMethod Soft) and: [ total > 21 ])
+            ifTrue: [
+                ^ self getValue: CountMethod Hard.
+            ].     
 
         ^ total
     ]
@@ -70,6 +66,7 @@ Hand subclass: DealerHand [
                         ifFalse: [
                             cardToDraw := card.
                         ].
+                    
                     cardsString := cardsString, (game drawCard: cardToDraw).
                     cardsString := cardsString, ' '.
                     index := index + 1.

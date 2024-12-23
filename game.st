@@ -114,22 +114,25 @@ Object subclass: Game [
             dealerHand dealCard.
         ].
 
-        (dealerHand upcardIsAce) ifTrue: [
-            self drawHands.
-            self askInsurance.
-            ^ self.
-        ].
+        (dealerHand upcardIsAce)
+            ifTrue: [
+                self drawHands.
+                self askInsurance.
+                ^ self.
+            ].
 
-        ((playerHands at: 1) isDone) ifTrue: [
-            dealerHand hideDownCard: false.
-        ].
+        ((playerHands at: 1) isDone)
+            ifTrue: [
+                dealerHand hideDownCard: false.
+            ].
 
-        ((playerHands at: 1) isDone) ifTrue: [
-            self payHands.
-            self drawHands.
-            self gameOptions.
-            ^ self.
-        ].
+        ((playerHands at: 1) isDone)
+            ifTrue: [
+                self payHands.
+                self drawHands.
+                self gameOptions.
+                ^ self.
+            ].
 
         self drawHands.
         (playerHands at: 1) getAction.
@@ -141,9 +144,10 @@ Object subclass: Game [
     ]
 
     Game >> drawCard: aCard [
-        faceType = 2 ifTrue: [
-            ^ (Card faces2 at: (aCard value)) at: (aCard suit).
-        ].
+        (faceType = 2)
+            ifTrue: [
+                ^ (Card faces2 at: (aCard value)) at: (aCard suit).
+            ].
         
         ^ (Card faces at: (aCard value)) at: (aCard suit).
     ]
@@ -167,38 +171,42 @@ Object subclass: Game [
         [ br not ] whileTrue: [
             c := (FileStream stdin next: 1) asLowercase.
 
-            (c = 'y') ifTrue: [
-                br := true.
-                self insureHand.
-            ].
+            (c = 'y')
+                ifTrue: [
+                    br := true.
+                    self insureHand.
+                ].
 
-            (c = 'n') ifTrue: [
-                br := true.
-                self noInsurance.
-            ].
+            (c = 'n')
+                ifTrue: [
+                    br := true.
+                    self noInsurance.
+                ].
         ].
     ]
 
     Game >> noInsurance [
         | playerHand |
 
-        (dealerHand isBlackjack) ifTrue: [
-            dealerHand hideDownCard: false.
-            dealerHand played: true.
-            self payHands.
-            self drawHands.
-            self gameOptions.
-            ^ self.
-        ].
+        (dealerHand isBlackjack)
+            ifTrue: [
+                dealerHand hideDownCard: false.
+                dealerHand played: true.
+                self payHands.
+                self drawHands.
+                self gameOptions.
+                ^ self.
+            ].
 
         playerHand := playerHands at: currentHand.
 
-        (playerHand isDone) ifTrue: [
-            self playDealerHand.
-            self drawHands.
-            self gameOptions.
-            ^ self.
-        ].
+        (playerHand isDone)
+            ifTrue: [
+                self playDealerHand.
+                self drawHands.
+                self gameOptions.
+                ^ self.
+            ].
 
         self drawHands.
         playerHand getAction.
@@ -220,17 +228,19 @@ Object subclass: Game [
     ]
 
     Game >> normalizeBet [
-        (currentBet < Game MinBet) ifTrue: [
-            currentBet := Game MinBet.
-        ] ifFalse: [
-            (currentBet > Game MaxBet) ifTrue: [
-                currentBet := Game MaxBet.
+        (currentBet < Game MinBet)
+            ifTrue: [
+                currentBet := Game MinBet.
+            ] ifFalse: [
+                (currentBet > Game MaxBet) ifTrue: [
+                    currentBet := Game MaxBet.
+                ].
             ].
-        ].
 
-        (currentBet > money) ifTrue: [
-            currentBet := money.
-        ].
+        (currentBet > money)
+            ifTrue: [
+                currentBet := money.
+            ].
     ]
 
     Game >> payHands [
@@ -282,21 +292,24 @@ Object subclass: Game [
     Game >> playDealerHand [
         | softCount hardCount |
 
-        (dealerHand isBlackjack) ifTrue: [
-            dealerHand hideDownCard: false.
-        ].
+        (dealerHand isBlackjack)
+            ifTrue: [
+                dealerHand hideDownCard: false.
+            ].
 
-        (self needToPlayDealerHand not) ifTrue: [
-            dealerHand played: true.
-            self payHands.
-            ^ self.
-        ].
+        (self needToPlayDealerHand not)
+            ifTrue: [
+                dealerHand played: true.
+                self payHands.
+                ^ self.
+            ].
 
         dealerHand hideDownCard: false.
 
         softCount := dealerHand getValue: CountMethod Soft.
         hardCount := dealerHand getValue: CountMethod Hard.
 
+        "TODO: try to remove outer ifTrue"
         (softCount < 18 and: [hardCount < 17]) ifTrue: [
             [ (softCount < 18 and: [hardCount < 17]) ] whileTrue: [
                 dealerHand dealCard.
@@ -318,22 +331,29 @@ Object subclass: Game [
         [ br not ] whileTrue: [
             c := (FileStream stdin next: 1) asLowercase.
 
-            (c = 'd') ifTrue: [
-                br := true.
-            ].
-            (c = 'b') ifTrue: [
-                br := true.
-                self betOptions.
-            ].
-            (c = 'o') ifTrue: [
-                br := true.
-                self configOptions.
-            ].
-            (c = 'q') ifTrue: [
-                br := true.
-                quitting := true.
-                self clear.
-            ].
+            (c = 'd')
+                ifTrue: [
+                    br := true.
+                ].
+            
+            (c = 'b')
+                ifTrue: [
+                    br := true.
+                    self betOptions.
+                ].
+            
+            (c = 'o')
+                ifTrue: [
+                    br := true.
+                    self configOptions.
+                ].
+            
+            (c = 'q')
+                ifTrue: [
+                    br := true.
+                    quitting := true.
+                    self clear.
+                ].
         ].
     ]
 
@@ -349,24 +369,31 @@ Object subclass: Game [
         [ br not ] whileTrue: [
             c := (FileStream stdin next: 1) asLowercase.
 
-            (c = 'n') ifTrue: [
-                br := true.
-                self numDecksOptions.
-            ].
-            (c = 't') ifTrue: [
-                br := true.
-                self deckTypeOptions.
-            ].
-            (c = 'f') ifTrue: [
-                br := true.
-                self faceTypeOptions.
-            ].
-            (c = 'b') ifTrue: [
-                br := true.
-                self clear.
-                self drawHands.
-                self gameOptions.
-            ].
+            (c = 'n')
+                ifTrue: [
+                    br := true.
+                    self numDecksOptions.
+                ].
+
+            (c = 't')
+                ifTrue: [
+                    br := true.
+                    self deckTypeOptions.
+                ].
+
+            (c = 'f')
+                ifTrue: [
+                    br := true.
+                    self faceTypeOptions.
+                ].
+
+            (c = 'b')
+                ifTrue: [
+                    br := true.
+                    self clear.
+                    self drawHands.
+                    self gameOptions.
+                ].
         ].
     ]
 
@@ -382,7 +409,10 @@ Object subclass: Game [
         ('123456' includes: c)
             ifTrue: [
                 self deckType: (c digitValue).
-                deckType > 1 ifTrue: [ self numDecks: 8. ].
+                (deckType > 1)
+                    ifTrue: [
+                        self numDecks: 8.
+                    ].
                 self saveGame.
                 shoe buildNewShoe.
                 self dealNewHand.
@@ -452,22 +482,29 @@ Object subclass: Game [
         [ br not ] whileTrue: [
             c := (FileStream stdin next: 1) asInteger.
 
-            (c = 1) ifTrue: [
-                br := true.
-                currentBet := 500.
-            ].
-            (c = 2) ifTrue: [
-                br := true.
-                currentBet := 1000.
-            ].
-            (c = 3) ifTrue: [
-                br := true.
-                currentBet := 2500.
-            ].
-            (c = 4) ifTrue: [
-                br := true.
-                currentBet := 10000.
-            ].
+            (c = 1)
+                ifTrue: [
+                    br := true.
+                    currentBet := 500.
+                ].
+            
+            (c = 2)
+                ifTrue: [
+                    br := true.
+                    currentBet := 1000.
+                ].
+            
+            (c = 3)
+                ifTrue: [
+                    br := true.
+                    currentBet := 2500.
+                ].
+            
+            (c = 4)
+                ifTrue: [
+                    br := true.
+                    currentBet := 10000.
+                ].
         ].
 
         self normalizeBet.
