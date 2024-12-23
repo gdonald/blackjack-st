@@ -17,21 +17,16 @@ Hand subclass: PlayerHand [
         ^ self
     ]
 
-    PlayerHand >> bet [
-        ^ bet
-    ]
+    PlayerHand >> game [ ^ game ]
+    PlayerHand >> bet [ ^ bet ]
 
-    PlayerHand >> paid [
-        ^ paid
-    ]
+    PlayerHand >> cards [ ^ cards ]
+    PlayerHand >> cards: aCards [ cards := aCards ]
 
-    PlayerHand >> paid: aBoolean [
-        paid := aBoolean.
-    ]
+    PlayerHand >> paid [ ^ paid ]
+    PlayerHand >> paid: aBoolean [ paid := aBoolean ]
 
-    PlayerHand >> status: aStatus [
-        status := aStatus.
-    ]
+    PlayerHand >> status: aStatus [ status := aStatus ]
 
     PlayerHand >> getValue: countMethod [
         | v total tmpV |
@@ -229,6 +224,8 @@ Hand subclass: PlayerHand [
     PlayerHand >> getAction [
         | out br c |
 
+        br := false.
+
         out := ' '.
 
         (self canHit) ifTrue: [ out := out, '(H) Hit  ' ].
@@ -238,26 +235,22 @@ Hand subclass: PlayerHand [
 
         Transcript show: out; cr.
 
-        br := false.
-
         [ br not ] whileTrue: [
             c := (FileStream stdin next: 1) asLowercase.
 
-            (c = 'h') ifTrue: [
+            ((c = 'h') and: [self canHit]) ifTrue: [
                 br := true.
                 self hit.
             ].
-            (c = 's') ifTrue: [
+            ((c = 's') and: [self canStand]) ifTrue: [
                 br := true.
                 self stand.
             ].
-            (c = 'p') ifTrue: [
-                (self canSplit) ifTrue: [
-                    br := true.
-                    self game splitCurrentHand.
-                ].
+            ((c = 'p') and: [self canSplit]) ifTrue: [
+                br := true.
+                game splitCurrentHand.
             ].
-            (c = 'd') ifTrue: [
+            ((c = 'd') and: [self canDbl]) ifTrue: [
                 br := true.
                 self dbl.
             ].

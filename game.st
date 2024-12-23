@@ -24,10 +24,14 @@ Object subclass: Game [
 
     Game class >> Run [
         | game |
+
         game := Game new.
+        game loadSavedGame.
 
         [ game quitting ]
-            whileFalse: [ game dealNewHand. ].
+            whileFalse: [
+                game dealNewHand.
+            ].
     ]
 
     Game class >> SaveFile [ ^ 'blackjack.txt' ]
@@ -50,16 +54,13 @@ Object subclass: Game [
     Game >> currentBet: aBet [ currentBet := aBet ]
 
     Game >> currentHand [ ^ currentHand ]
+    Game >> currentHand: aCurrentHand [ currentHand := aCurrentHand ]
 
     Game >> deckType [ ^ deckType ]
     Game >> deckType: aDeckType [ deckType := aDeckType ]
 
     Game >> faceType [ ^ faceType ]
     Game >> faceType: aFaceType [ faceType := aFaceType ]
-
-    Game >> clear [
-
-    ]
 
     Game >> dealerHand [ ^ dealerHand ]
     Game >> playerHands [ ^ playerHands ]
@@ -239,25 +240,29 @@ Object subclass: Game [
         dhb := dealerHand isBusted.
 
         playerHands do: [ :playerHand |
-            playerHand paid ifTrue: [ ^ self ].
+            (playerHand paid)
+                ifFalse: [
+                    playerHand paid: true.
+                    phv := playerHand getValue: CountMethod Soft.
 
-            playerHand paid: true.
-            phv := playerHand getValue: CountMethod Soft.
-
-            (dhb = true or: [phv > dhv]) ifTrue: [
-                (playerHand isBlackjack) ifTrue: [
-                    playerHand bet: playerHand bet * 1.5.
+                    (dhb = true or: [phv > dhv])
+                        ifTrue: [
+                            (playerHand isBlackjack)
+                                ifTrue: [
+                                    playerHand bet: playerHand bet * 1.5.
+                                ].
+                            self money: self money + playerHand bet.
+                            playerHand status: HandStatus Won.
+                        ] ifFalse: [
+                            (phv < dhv)
+                                ifTrue: [
+                                    self money: self money - playerHand bet.
+                                    playerHand status: HandStatus Lost.
+                                ] ifFalse: [
+                                    playerHand status: HandStatus Push.
+                                ].
+                        ].
                 ].
-                self money: self money + playerHand bet.
-                playerHand status: HandStatus Won.
-            ] ifFalse: [
-                (phv < dhv) ifTrue: [
-                    self money: self money - playerHand bet.
-                    playerHand status: HandStatus Lost.
-                ] ifFalse: [
-                    playerHand status: HandStatus Push.
-                ].
-            ].
         ].
 
         self normalizeBet.
@@ -302,27 +307,6 @@ Object subclass: Game [
 
         dealerHand played: true.
         self payHands.
-    ]
-
-    Game >> saveGame [
-        | file |
-
-        [ 
-            file := FileStream fileNamed: Game SaveFile mode: 'w'.
-        ] on: Error do: [ :ex | file := nil ].
-
-        file ifNotNil: [
-            file nextPutAll: (String streamContents: [ :stream |
-                stream nextPutAll: shoe numDecks asString; nextPut: $|.
-                stream nextPutAll: money asString; nextPut: $|.
-                stream nextPutAll: currentBet asString; nextPut: $|.
-                stream nextPutAll: deckType asString; nextPut: $|.
-                stream nextPutAll: faceType asString.
-            ]).
-            file close.
-        ].
-
-        ^ true.
     ]
 
     Game >> gameOptions [
@@ -494,5 +478,117 @@ Object subclass: Game [
             whileTrue: [ FileStream stdin next ]. 
 
         ^ (FileStream stdin next: 1) first.
+    ]
+
+    Game >> splitCurrentHand [
+        | handCount newHand currentPlayerHand splitHand h card |
+        
+        handCount := self playerHands size.
+        newHand := PlayerHand game: self.
+        self playerHands add: newHand.
+        
+        [ handCount > self currentHand ] whileTrue: [
+            h := (self playerHands at: handCount) copy.
+            self playerHands at: handCount + 1 put: h.
+            handCount := handCount - 1
+        ].
+        
+        currentPlayerHand := self playerHands at: self currentHand.
+        splitHand := self playerHands at: (self currentHand + 1).
+        
+        card := (currentPlayerHand cards at: 2) copy.
+        splitHand cards: OrderedCollection new.
+        splitHand cards add: card.
+
+        card := (currentPlayerHand cards at: 1) copy.
+        currentPlayerHand cards: OrderedCollection new.
+        currentPlayerHand cards add: card.
+        
+        currentPlayerHand dealCard.
+        
+        (currentPlayerHand isDone)
+            ifTrue: [ 
+                currentPlayerHand process.
+                ^ self
+            ].
+        
+        self drawHands.
+        currentPlayerHand getAction
+    ]
+
+    Game >> playMoreHands [
+        | playerHand |
+
+        self currentHand: self currentHand + 1.
+        playerHand := playerHands at: currentHand.
+        playerHand dealCard.
+        
+        (playerHand isDone)
+            ifTrue: [ 
+                playerHand process.
+                ^self
+            ].
+            
+        self drawHands.
+        playerHand getAction
+    ]
+
+    Game >> saveGame [
+        | file |
+
+        [
+            file := FileStream open: (Game SaveFile) mode: #write.
+        ] on: Error do: [ :ex | file := nil ].
+
+        file ifNotNil: [
+            file nextPutAll: (String streamContents: [ :stream |
+                stream nextPutAll: numDecks asString; nextPut: $|.
+                stream nextPutAll: money asString; nextPut: $|.
+                stream nextPutAll: currentBet asString; nextPut: $|.
+                stream nextPutAll: deckType asString; nextPut: $|.
+                stream nextPutAll: faceType asString.
+            ]).
+
+            file close.
+        ].
+
+        ^ true.
+    ]
+
+    Game >> loadSavedGame [
+        | file str array |
+
+        str := ''.
+        
+        [
+            file := FileStream open: (Game SaveFile) mode: #read.
+        ] on: Error do: [ :ex | file := nil ].
+        
+        file notNil ifTrue: [
+            str := file contents.
+            file close.
+            str := str trimSeparators
+        ].
+        
+        array := str subStrings: '|'.
+
+        (array size = 5)
+            ifTrue: [
+                self numDecks: ((array at: 1) asInteger).
+                self money: ((array at: 2) asInteger).
+                self currentBet: ((array at: 3) asInteger).
+                self deckType: ((array at: 4) asInteger).
+                self faceType: ((array at: 5) asInteger).
+            ].
+        
+        (self money < Game MinBet)
+            ifTrue: [
+                self money: 10000.
+                self currentBet: Game MinBet
+            ].
+    ]
+
+    Game >> clear [
+        FileStream stdout nextPutAll: (Character value: 27) asString, '[H', (Character value: 27) asString, '[J'.
     ]
 ]

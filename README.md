@@ -4,10 +4,8 @@ Console Blackjack written in GNU Smalltalk
 
 ### Run
 
-`brew install gnu-smalltalk`
+    # Install GNU Smalltalk
+    brew install gnu-smalltalk
 
-`gst --quiet blackjack.st`
-
-### Status
-
-Work in progress
+    # Run the game
+    ./blackjack

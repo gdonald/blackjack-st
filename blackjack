@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+stty -icanon min 1 time 0
+gst --quiet blackjack.st
+stty icanon min 1 time 0
