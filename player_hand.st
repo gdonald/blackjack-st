@@ -18,7 +18,9 @@ Hand subclass: PlayerHand [
     ]
 
     PlayerHand >> game [ ^ game ]
+
     PlayerHand >> bet [ ^ bet ]
+    PlayerHand >> bet: aBet [ bet := aBet ]
 
     PlayerHand >> cards [ ^ cards ]
     PlayerHand >> cards: aCards [ cards := aCards ]
@@ -45,17 +47,17 @@ Hand subclass: PlayerHand [
 
             total := total + v.
         ].
-        
+
         ((countMethod = CountMethod Soft) and: [ total > 21 ]) ifTrue: [
             ^ self getValue: CountMethod Hard.
-        ].        
+        ].
 
         ^ total
     ]
 
     PlayerHand >> drawHand: currentHand [
         | cardsString index cardCount |
-        
+
         index := 1.
         cardCount := cards size.
         cardsString := ' '.

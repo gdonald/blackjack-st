@@ -27,6 +27,6 @@ Object subclass: Hand [
     ]
 
     Hand >> isBlackjack [
-        ^ (cards size = 2) and: [ (self getValue: CountMethod Hard) = 21 ]
+        ^ (cards size = 2) and: [21 = (self getValue: CountMethod Soft)]
     ]
 ]

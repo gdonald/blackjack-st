@@ -96,7 +96,7 @@ Object subclass: Game [
             Transcript show: (playerHand drawHand: index); cr; cr.
         ].
     ]
-    
+
     Game >> dealNewHand [
         | playerHand |
 
@@ -148,7 +148,7 @@ Object subclass: Game [
             ifTrue: [
                 ^ (Card faces2 at: (aCard value)) at: (aCard suit).
             ].
-        
+
         ^ (Card faces at: (aCard value)) at: (aCard suit).
     ]
 
@@ -259,9 +259,9 @@ Object subclass: Game [
                         ifTrue: [
                             (playerHand isBlackjack)
                                 ifTrue: [
-                                    playerHand bet: playerHand bet * 1.5.
+                                    playerHand bet: (playerHand bet) * 1.5.
                                 ].
-                            self money: self money + playerHand bet.
+                            self money: self money + (playerHand bet).
                             playerHand status: HandStatus Won.
                         ] ifFalse: [
                             (phv < dhv)
@@ -335,19 +335,19 @@ Object subclass: Game [
                 ifTrue: [
                     br := true.
                 ].
-            
+
             (c = 'b')
                 ifTrue: [
                     br := true.
                     self betOptions.
                 ].
-            
+
             (c = 'o')
                 ifTrue: [
                     br := true.
                     self configOptions.
                 ].
-            
+
             (c = 'q')
                 ifTrue: [
                     br := true.
@@ -487,19 +487,19 @@ Object subclass: Game [
                     br := true.
                     currentBet := 500.
                 ].
-            
+
             (c = 2)
                 ifTrue: [
                     br := true.
                     currentBet := 1000.
-                ].
-            
+            ].
+
             (c = 3)
                 ifTrue: [
                     br := true.
                     currentBet := 2500.
                 ].
-            
+
             (c = 4)
                 ifTrue: [
                     br := true.
@@ -519,20 +519,20 @@ Object subclass: Game [
 
     Game >> splitCurrentHand [
         | handCount newHand currentPlayerHand splitHand h card |
-        
+
         handCount := self playerHands size.
         newHand := PlayerHand game: self.
         self playerHands add: newHand.
-        
+
         [ handCount > self currentHand ] whileTrue: [
             h := (self playerHands at: handCount) copy.
             self playerHands at: handCount + 1 put: h.
             handCount := handCount - 1
         ].
-        
+
         currentPlayerHand := self playerHands at: self currentHand.
         splitHand := self playerHands at: (self currentHand + 1).
-        
+
         card := (currentPlayerHand cards at: 2) copy.
         splitHand cards: OrderedCollection new.
         splitHand cards add: card.
@@ -540,15 +540,15 @@ Object subclass: Game [
         card := (currentPlayerHand cards at: 1) copy.
         currentPlayerHand cards: OrderedCollection new.
         currentPlayerHand cards add: card.
-        
+
         currentPlayerHand dealCard.
-        
+
         (currentPlayerHand isDone)
             ifTrue: [ 
                 currentPlayerHand process.
                 ^ self
             ].
-        
+
         self drawHands.
         currentPlayerHand getAction
     ]
@@ -559,13 +559,13 @@ Object subclass: Game [
         self currentHand: self currentHand + 1.
         playerHand := playerHands at: currentHand.
         playerHand dealCard.
-        
+
         (playerHand isDone)
             ifTrue: [ 
                 playerHand process.
                 ^self
             ].
-            
+
         self drawHands.
         playerHand getAction
     ]
@@ -596,17 +596,17 @@ Object subclass: Game [
         | file str array |
 
         str := ''.
-        
+
         [
             file := FileStream open: (Game SaveFile) mode: #read.
         ] on: Error do: [ :ex | file := nil ].
-        
+
         file notNil ifTrue: [
             str := file contents.
             file close.
             str := str trimSeparators
         ].
-        
+
         array := str subStrings: '|'.
 
         (array size = 5)
@@ -617,7 +617,7 @@ Object subclass: Game [
                 self deckType: ((array at: 4) asInteger).
                 self faceType: ((array at: 5) asInteger).
             ].
-        
+
         (self money < Game MinBet)
             ifTrue: [
                 self money: 10000.

@@ -45,7 +45,7 @@ Object subclass: Shoe [
         (game deckType = 4) ifTrue: [ ^ self newAcesJacks ].
         (game deckType = 5) ifTrue: [ ^ self newSevens ].
         (game deckType = 6) ifTrue: [ ^ self newEights ].
-        
+
         self newRegular
     ]
 

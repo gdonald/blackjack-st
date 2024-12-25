@@ -4,7 +4,7 @@ Object subclass: Card [
     Card class >> initializeWithValue: aValue suit: aSuit [
         ^ self new initialize: aValue suit: aSuit
     ]
-    
+
     Card >> initialize: aValue suit: aSuit [
         value := aValue.
         suit := aSuit.

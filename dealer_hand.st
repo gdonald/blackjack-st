@@ -42,11 +42,11 @@ Hand subclass: DealerHand [
                     total := total + v.
                 ].
         ].
-        
+
         ((countMethod = CountMethod Soft) and: [ total > 21 ])
             ifTrue: [
                 ^ self getValue: CountMethod Hard.
-            ].     
+            ].
 
         ^ total
     ]
@@ -66,7 +66,7 @@ Hand subclass: DealerHand [
                         ifFalse: [
                             cardToDraw := card.
                         ].
-                    
+
                     cardsString := cardsString, (game drawCard: cardToDraw).
                     cardsString := cardsString, ' '.
                     index := index + 1.
