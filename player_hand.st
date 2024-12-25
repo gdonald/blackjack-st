@@ -149,8 +149,8 @@ Hand subclass: PlayerHand [
     PlayerHand >> canSplit [
         stood ifTrue: [ ^ false ].
         (game playerHands size >= Game MaxPlayerHands) ifTrue: [ ^ false ].
-        (game money < (game allBets + bet)) ifTrue: [ ^ false ].
-        (cards size = 2 and: [(cards at: 1) value = (cards at: 2) value]) ifTrue: [ ^ true ].
+        (game money < ((game allBets) + bet)) ifTrue: [ ^ false ].
+        ((cards size = 2) and: [(cards at: 1) value = (cards at: 2) value]) ifTrue: [ ^ true ].
 
         ^ false.
     ]
@@ -236,9 +236,7 @@ Hand subclass: PlayerHand [
     ]
 
     PlayerHand >> getAction [
-        | out br c |
-
-        br := false.
+        | out c |
 
         out := ' '.
         (self canHit)   ifTrue: [ out := out, '(H) Hit  ' ].
@@ -247,33 +245,29 @@ Hand subclass: PlayerHand [
         (self canDbl)   ifTrue: [ out := out, '(D) Double  ' ].
 
         Transcript show: out; cr.
+        c := (game getChar).
 
-        [ br not ] whileTrue: [
-            c := (FileStream stdin next: 1) asLowercase.
-
-            ((c = 'h') and: [self canHit])
-                ifTrue: [
-                    br := true.
-                    self hit.
-                ].
-            
-            ((c = 's') and: [self canStand])
-                ifTrue: [
-                    br := true.
-                    self stand.
-                ].
-            
-            ((c = 'p') and: [self canSplit])
-                ifTrue: [
-                    br := true.
-                    game splitCurrentHand.
-                ].
-            
-            ((c = 'd') and: [self canDbl])
-                ifTrue: [
-                    br := true.
-                    self dbl.
-                ].
+        ((c = $h) and: [self canHit]) ifTrue: [
+            self hit.
+            ^ self.
         ].
+
+        ((c = $s) and: [self canStand]) ifTrue: [
+            self stand.
+            ^ self.
+        ].
+
+        ((c = $p) and: [self canSplit]) ifTrue: [
+            game splitCurrentHand.
+            ^ self.
+        ].
+
+        ((c = $d) and: [self canDbl]) ifTrue: [
+            self dbl.
+            ^ self.
+        ].
+
+        game drawHands.
+        ^ self getAction.
     ]
 ]
